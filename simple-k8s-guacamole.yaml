@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacd
+  labels:
+    name: guacd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: guacd
+  template:
+    metadata:
+      labels:
+        name: guacd
+    spec:
+      containers:
+      - name: guacd
+        image: guacamole/guacd
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          tcpSocket:
+            port: 4822
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guacd
+  labels:
+    name: guacd
+spec:
+  ports:
+  - name: guacd-listen
+    protocol: "TCP"
+    port: 4822
+    targetPort: 4822
+  selector:
+    name: guacd
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guac-postgres
+  labels:
+    name: guac-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: guac-postgres
+  template:
+    metadata:
+      labels:
+        name: guac-postgres
+    spec:
+      volumes:
+      - hostPath:
+          path: /volumes/guac-postgres
+        name: pgdata
+      containers:
+      - name: guac-postgres
+        image: postgres 
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/pgdata
+          name: pgdata
+        env:
+        - name: POSTGRES_DB
+          value: "guacamole_db"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guac-postgres
+  labels:
+    name: guac-postgres
+spec:
+  ports:
+  - name: pgport
+    protocol: "TCP"
+    port: 5432
+    targetPort: 5432
+  selector:
+    name: guac-postgres
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacamole 
+  labels:
+    name: guacamole 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: guacamole 
+  template:
+    metadata:
+      labels:
+        name: guacamole 
+    spec:
+      containers:
+      - name: guacamole 
+        image: guacamole/guacamole 
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          tcpSocket:
+            port: 8080 
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        env:
+        - name: POSTGRES_DATABASE 
+          value: "guacamole_db"
+        - name: POSTGRES_USER 
+          value: "guacamole_user"
+        - name: POSTGRES_PASSWORD 
+          value: "Z?X>C<VMNB"
+        - name: POSTGRES_HOSTNAME
+          value: "guac-postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: GUACD_HOSTNAME
+          value: "guacd"
+        - name: GUACD_PORT
+          value: "4822"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guacamole 
+  labels:
+    name: guacamole 
+spec:
+  ports:
+  - name: web-port
+    protocol: "TCP"
+    port: 9080 
+    targetPort: 8080 
+    nodePort: 9080 
+  selector:
+    name: guacamole 
+  type: NodePort
