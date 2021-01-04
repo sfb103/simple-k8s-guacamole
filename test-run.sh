@@ -1,4 +1,4 @@
-POSTGRES_DATA="guac-postgres-data"
+POSTGRES_DATA="/volumes/guac-postgres"
 
 docker rm -f guacamole
 docker rm -f guacd
