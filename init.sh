@@ -1,6 +1,6 @@
 #!/bin/bash
 
-POSTGRES_DATA="guac-postgres-data"
+POSTGRES_DATA="/volumes/guac-postgres"
 
 docker rm -f guacamole
 docker rm -f guacd
@@ -11,9 +11,8 @@ docker pull guacamole/guacd
 docker pull guacamole/guacamole
 docker pull postgres 
 
-# Create a fresh docker volume to hold the postgres database
-docker volume rm $POSTGRES_DATA
-docker volume create --name $POSTGRES_DATA
+# Ensure our POSTGRES_DATA path exists as expected
+mkdir -f $POSTGRES_DATA
 
 # Create script to prepare postgres database
 docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgres > initdb.sql
