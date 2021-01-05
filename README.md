@@ -12,7 +12,7 @@ Before first use, the postgres database must be seeded.  This can be done simply
 ```
 ./init.sh
 ```
-**Note**, this script and the guac-postgres deployment currenlty assumse the persistent data for postgres is simply kept in a ```/volumes/guac-postgres``` host directory.
+**Note**, this script and the guac-postgres deployment currenlty assumes the persistent data for postgres is simply kept in a ```/volumes/guac-postgres``` host directory.
  
 Then, to provision the guacamole deployments on the kubernetes cluster, simply:
 ```
@@ -20,4 +20,4 @@ kubectl apply -f simple-k8s-guacamole.yaml
 ```
 **Note**, The guacamole web-client is currently explosed through a cluster nodePort: 9080
 
-Once each guacamole container is ready on the cluster, you can navigate to the web-client using the node-port specified above.  Once the web-client is accessed, follow the documentation on the [Appache Guacamole](https://guacamole.apache.org/) site to setup new users and connections.
+Once each guacamole pod is ready on the cluster, you can navigate to the web-client using the node-port specified above.  Once the web-client is accessed, follow the documentation on the [Appache Guacamole](https://guacamole.apache.org/) site to setup new users and connections.
